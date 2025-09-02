@@ -1,0 +1,8 @@
+# Abaikan file environment yang berisi secrets
+.env
+
+# Folder cache Python
+__pycache__/
+
+# File database SQLite
+*.db
