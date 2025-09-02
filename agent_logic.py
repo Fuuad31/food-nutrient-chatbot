@@ -1,10 +1,10 @@
 # agent_logic.py
 
 from langchain_core.messages import HumanMessage
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain import hub # <-- ADD THIS IMPORT
 
 # Impor klien yang sudah diinisialisasi dari config.py
 from config import llm, exa_client, GOOGLE_API_KEY
@@ -56,17 +56,10 @@ def create_agent():
     """Fungsi utama untuk membuat dan merakit agent."""
     tools = [describe_image, search_nutrition_info]
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """Anda adalah seorang ahli gizi AI yang cerdas dan ramah.
-- Analisis gambar makanan jika disediakan.
-- Gunakan tools untuk mencari informasi.
-- Jawab pertanyaan pengguna berdasarkan riwayat percakapan.
-- Berikan jawaban yang terstruktur dan mudah dibaca (gunakan markdown seperti bold dan bullet points).
-- Jika tidak tahu, katakan tidak tahu. Jangan mengarang informasi."""),
-        MessagesPlaceholder(variable_name="chat_history"),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad"),
-    ])
+    # --- REPLACE THE OLD PROMPT WITH THIS LINE ---
+    # Pull the standard ReAct agent prompt from LangChain Hub
+    prompt = hub.pull("hwchase17/react-chat")
+    # ---------------------------------------------
 
     agent = create_react_agent(llm, tools, prompt)
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
